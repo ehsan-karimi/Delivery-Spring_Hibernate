@@ -16,9 +16,9 @@ public class UserController {
     private UserService userService;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/greeting2", method = RequestMethod.GET)
-    public String getEmployees() {
-        return "Welcome!";
+    @RequestMapping(value = "/user/list", method = RequestMethod.GET)
+    public ResponseEntity<?> getUsers() {
+        return ResponseEntity.ok(userService.getUserList());
     }
 
     @RequestMapping(value = "/user/register", method = RequestMethod.POST)

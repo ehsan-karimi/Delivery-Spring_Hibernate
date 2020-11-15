@@ -10,12 +10,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @Service
-public class UserService  {
+public class UserService {
     @Autowired
     private UserRepository userDao;
     @Autowired
@@ -26,8 +27,6 @@ public class UserService  {
     private StatusRepository statusRepository;
 
     public UserDao save(UserDto user) {
-//        int roleId = roleRepository.findByName("USER").getId();
-//        int statusId = statusRepository.findByName("NOT_ACTIVE").getId();
         RoleDao roleDao = roleRepository.findByName("USER");
         StatusDao statusDao = statusRepository.findByName("NOT_ACTIVE");
 
@@ -39,17 +38,55 @@ public class UserService  {
         return userDao.save(newUser);
     }
 
+    public List getUserList() {
+        Iterable<UserDao> iterable = userDao.findAll();
+        List<UserList<Long, String, String, String, Timestamp, Timestamp>> listUsers = new ArrayList<>();
+        iterable.forEach(s -> {
+            listUsers.add(new UserList(s.getId(), s.getUsername(), s.getRole(), s.getStatus(), s.getCreatedAt(), s.getUpdatedAt()));
+        });
+        return listUsers;
+    }
+
     @EventListener
     public void appReady(ApplicationReadyEvent event) {
-        RoleDao role = new RoleDao();
-        role.setName("USER");
-        role.setDescription("Access To SomeThing");
-        roleRepository.save(role);
+        List<String> listRoles = new ArrayList<>();
+        listRoles.add("ADMIN");
+        listRoles.add("USER");
+        List<String> listRolesDescription = new ArrayList<>();
+        listRolesDescription.add("Full Access");
+        listRolesDescription.add("Limited Access");
 
-        StatusDao statusDao = new StatusDao();
-        statusDao.setDescription("didnt authenticate");
-        statusDao.setName("NOT_ACTIVE");
-        statusRepository.save(statusDao);
+        for (int a = 0; a < listRoles.size(); a++) {
+            RoleDao role = new RoleDao();
+            role.setName(listRoles.get(a));
+            role.setDescription(listRolesDescription.get(a));
+            roleRepository.save(role);
+        }
+
+        List<String> listStatus = new ArrayList<>();
+        listStatus.add("ACTIVE");
+        listStatus.add("NOT_ACTIVE");
+        listStatus.add("DELETED");
+        List<String> listStatusDescription = new ArrayList<>();
+        listStatusDescription.add("Have Token");
+        listStatusDescription.add("WithOut Token");
+        listStatusDescription.add("Deleted Logically");
+
+        for (int a = 0; a < listStatus.size(); a++) {
+            StatusDao statusDao = new StatusDao();
+            statusDao.setDescription(listStatusDescription.get(a));
+            statusDao.setName(listStatus.get(a));
+            statusRepository.save(statusDao);
+        }
+
+        RoleDao roleDao = roleRepository.findByName("ADMIN");
+        StatusDao statusDao = statusRepository.findByName("NOT_ACTIVE");
+        UserDao addAdmin = new UserDao();
+        addAdmin.setUsername("Admin");
+        addAdmin.setPassword(bcryptEncoder.encode("1234"));
+        addAdmin.setRoleDao(roleDao);
+        addAdmin.setStatusDao(statusDao);
+        userDao.save(addAdmin);
     }
 
 }

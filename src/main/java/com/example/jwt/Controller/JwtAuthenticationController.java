@@ -36,7 +36,14 @@ public class JwtAuthenticationController {
 
         final String token = jwtTokenUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new JwtResponse(token));
+        Boolean tokenSaved = userDetailsService.saveToken(token, authenticationRequest.getUsername());
+
+        if (tokenSaved){
+            return ResponseEntity.ok(new JwtResponse(token));
+        }else {
+            return ResponseEntity.ok("Failed to create token, Try again!!!");
+        }
+
     }
 
 

@@ -1,8 +1,12 @@
 package com.example.jwt.Service;
 
+import com.example.jwt.Model.JwtDao;
+import com.example.jwt.Model.StatusDao;
 import com.example.jwt.Model.UserDao;
 import com.example.jwt.Model.UserDto;
+import com.example.jwt.Repository.JwtRepository;
 import com.example.jwt.Repository.RoleRepository;
+import com.example.jwt.Repository.StatusRepository;
 import com.example.jwt.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -20,14 +24,20 @@ import java.util.Set;
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
-    private UserRepository userDao;
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtRepository jwtRepository;
 
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
+    @Autowired
+    private StatusRepository statusRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDao user = userDao.findByUsername(username);
+        UserDao user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
@@ -46,24 +56,24 @@ public class JwtUserDetailsService implements UserDetailsService {
         //return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
-    public UserDao save(UserDto user) {
-        UserDao newUser = new UserDao();
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
-        return userDao.save(newUser);
-    }
+    public Boolean saveToken(String token, String username){
+        UserDao userDao = userRepository.findByUsername(username);
+        StatusDao statusDao = statusRepository.findByName("ACTIVE");
+        JwtDao jwtDao = new JwtDao();
+        jwtDao.setStatusDao(statusDao);
+        jwtDao.setToken(token);
+        jwtDao.setUserDao(userDao);
+        jwtRepository.save(jwtDao);
 
-    @EventListener
-    public void appReady(ApplicationReadyEvent event) {
-//        Role role = new Role();
-//        role.setName("Admin");
-//        role.setDescription("Access To EveryThing");
-//        roleRepository.save(role);
+        jwtDao = jwtRepository.findByUserDao(userDao);
 
-//        UserDao newUser = new UserDao();
-//        newUser.setUsername("Ali");
-//        newUser.setPassword(bcryptEncoder.encode("1234"));
-//        newUser.setId(1L);
-//        userDao.save(newUser);
+        userDao.setJwtDao(jwtDao);
+        userDao.setStatusDao(statusDao);
+
+        if (userRepository.save(userDao).getJwtDao().getToken() != null){
+            return true;
+        }else {
+            return false;
+        }
     }
 }

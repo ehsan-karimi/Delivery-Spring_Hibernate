@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 public class UserDao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private long id;
     @Column
     private String username;
@@ -99,8 +100,12 @@ public class UserDao {
         return roleDao;
     }
 
-    public String getName() {
+    public String getRole() {
         return roleDao.getName();
+    }
+
+    public String getStatus(){
+        return statusDao.getName();
     }
 
     public void setRoleDao(RoleDao roleDao) {

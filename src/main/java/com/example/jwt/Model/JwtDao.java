@@ -18,7 +18,7 @@ public class JwtDao {
     private UserDao userDao;
 
     @ManyToOne()
-    @JoinColumn(name="status_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name="status_id", referencedColumnName = "id")
     private StatusDao statusDao;
 
     public UserDao getUserDao() {
