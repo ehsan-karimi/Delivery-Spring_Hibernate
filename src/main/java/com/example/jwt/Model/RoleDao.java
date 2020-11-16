@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class RoleDao {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column

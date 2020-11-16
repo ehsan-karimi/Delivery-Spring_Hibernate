@@ -56,11 +56,11 @@ public class JwtUserDetailsService implements UserDetailsService {
         //return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
-    public Boolean saveToken(String token, String username){
+    public Boolean saveToken(String token, String username) {
         UserDao userDao = userRepository.findByUsername(username);
         StatusDao statusDeleted = statusRepository.findByName("DELETED");
 
-        if (statusDeleted != userDao.getStatusDao()){
+        if (statusDeleted != userDao.getStatusDao()) {
             StatusDao statusDao = statusRepository.findByName("ACTIVE");
             JwtDao jwtDao = new JwtDao();
             jwtDao.setStatusDao(statusDao);
@@ -75,10 +75,9 @@ public class JwtUserDetailsService implements UserDetailsService {
         }
 
 
-
-        if (userRepository.save(userDao).getJwtDao().getToken() != null){
+        if (userRepository.save(userDao).getJwtDao().getToken() != null) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }

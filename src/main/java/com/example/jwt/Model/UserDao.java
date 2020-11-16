@@ -23,12 +23,12 @@ public class UserDao {
     private String password;
 
     @ManyToOne()
-    @JoinColumn(name="role_id", referencedColumnName = "id")
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
     @JsonIgnore
     private RoleDao roleDao;
 
     @ManyToOne()
-    @JoinColumn(name="status_id", referencedColumnName = "id")
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
     @JsonIgnore
     private StatusDao statusDao;
 
@@ -42,7 +42,7 @@ public class UserDao {
     private Timestamp updatedAt;
 
     @OneToOne
-    @JoinColumn(name="jwt_id", referencedColumnName = "id")
+    @JoinColumn(name = "jwt_id", referencedColumnName = "id")
     @JsonIgnore
     private JwtDao jwtDao;
 
@@ -104,7 +104,7 @@ public class UserDao {
         return roleDao.getName();
     }
 
-    public String getStatus(){
+    public String getStatus() {
         return statusDao.getName();
     }
 

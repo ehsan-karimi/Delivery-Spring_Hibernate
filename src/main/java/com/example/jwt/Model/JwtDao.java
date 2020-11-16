@@ -14,11 +14,11 @@ public class JwtDao {
     private String token;
 
     @OneToOne
-    @JoinColumn(name="user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserDao userDao;
 
     @ManyToOne()
-    @JoinColumn(name="status_id", referencedColumnName = "id")
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
     private StatusDao statusDao;
 
     public UserDao getUserDao() {

@@ -2,18 +2,10 @@ package com.example.jwt.Service;
 
 import com.example.jwt.Config.JwtTokenUtil;
 import com.example.jwt.Model.*;
-import com.example.jwt.Repository.JwtRepository;
-import com.example.jwt.Repository.RoleRepository;
-import com.example.jwt.Repository.StatusRepository;
-import com.example.jwt.Repository.UserRepository;
+import com.example.jwt.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,6 +34,8 @@ public class UserService {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private JwtUserDetailsService userDetailsService;
+    @Autowired
+    private TagRepository tagRepository;
 
     public UserDao save(UserDto user) {
         RoleDao roleDao = roleRepository.findByName("USER");
@@ -182,10 +176,12 @@ public class UserService {
         listStatus.add("ACTIVE");
         listStatus.add("NOT_ACTIVE");
         listStatus.add("DELETED");
+        listStatus.add("ACTIVE_PRODUCT");
         List<String> listStatusDescription = new ArrayList<>();
         listStatusDescription.add("Have Token");
         listStatusDescription.add("WithOut Token");
         listStatusDescription.add("Deleted Logically");
+        listStatusDescription.add("Product Exist");
 
         for (int a = 0; a < listStatus.size(); a++) {
             StatusDao statusDao = new StatusDao();
@@ -202,6 +198,21 @@ public class UserService {
         addAdmin.setRoleDao(roleDao);
         addAdmin.setStatusDao(statusDao);
         userRepository.save(addAdmin);
+
+
+        List<String> listTags = new ArrayList<>();
+        listTags.add("CLOTHS");
+        listTags.add("DIGITAL");
+        List<String> listTagsDescription = new ArrayList<>();
+        listTagsDescription.add("Pooshak");
+        listTagsDescription.add("Lavazem Digital");
+
+        for (int a = 0; a < listTags.size(); a++) {
+            TagDao tagDao = new TagDao();
+            tagDao.setName(listTags.get(a));
+            tagDao.setDescription(listTagsDescription.get(a));
+            tagRepository.save(tagDao);
+        }
     }
 
 }
