@@ -58,17 +58,23 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     public Boolean saveToken(String token, String username){
         UserDao userDao = userRepository.findByUsername(username);
-        StatusDao statusDao = statusRepository.findByName("ACTIVE");
-        JwtDao jwtDao = new JwtDao();
-        jwtDao.setStatusDao(statusDao);
-        jwtDao.setToken(token);
-        jwtDao.setUserDao(userDao);
-        jwtRepository.save(jwtDao);
+        StatusDao statusDeleted = statusRepository.findByName("DELETED");
 
-        jwtDao = jwtRepository.findByUserDao(userDao);
+        if (statusDeleted != userDao.getStatusDao()){
+            StatusDao statusDao = statusRepository.findByName("ACTIVE");
+            JwtDao jwtDao = new JwtDao();
+            jwtDao.setStatusDao(statusDao);
+            jwtDao.setToken(token);
+            jwtDao.setUserDao(userDao);
+            jwtRepository.save(jwtDao);
 
-        userDao.setJwtDao(jwtDao);
-        userDao.setStatusDao(statusDao);
+            jwtDao = jwtRepository.findByUserDao(userDao);
+
+            userDao.setJwtDao(jwtDao);
+            userDao.setStatusDao(statusDao);
+        }
+
+
 
         if (userRepository.save(userDao).getJwtDao().getToken() != null){
             return true;

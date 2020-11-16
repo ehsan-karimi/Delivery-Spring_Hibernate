@@ -1,12 +1,21 @@
 package com.example.jwt.Service;
 
+import com.example.jwt.Config.JwtTokenUtil;
 import com.example.jwt.Model.*;
+import com.example.jwt.Repository.JwtRepository;
 import com.example.jwt.Repository.RoleRepository;
 import com.example.jwt.Repository.StatusRepository;
 import com.example.jwt.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +27,21 @@ import java.util.List;
 @Service
 public class UserService {
     @Autowired
-    private UserRepository userDao;
+    private UserRepository userRepository;
     @Autowired
     private PasswordEncoder bcryptEncoder;
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private JwtUserDetailsService jwtUserDetailsService;
+    @Autowired
+    private JwtRepository jwtRepository;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private JwtUserDetailsService userDetailsService;
 
     public UserDao save(UserDto user) {
         RoleDao roleDao = roleRepository.findByName("USER");
@@ -35,17 +52,115 @@ public class UserService {
         newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
         newUser.setRoleDao(roleDao);
         newUser.setStatusDao(statusDao);
-        return userDao.save(newUser);
+        return userRepository.save(newUser);
     }
 
     public List getUserList() {
-        Iterable<UserDao> iterable = userDao.findAll();
+        Iterable<UserDao> iterable = userRepository.findAll();
         List<UserList<Long, String, String, String, Timestamp, Timestamp>> listUsers = new ArrayList<>();
         iterable.forEach(s -> {
             listUsers.add(new UserList(s.getId(), s.getUsername(), s.getRole(), s.getStatus(), s.getCreatedAt(), s.getUpdatedAt()));
         });
         return listUsers;
     }
+
+    public UserUpdateResponse update(UserUpdate userUpdate) {
+        UserDao userDao = userRepository.findByUsername(userUpdate.getUsername());
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(userUpdate.getUsername());
+        if (userUpdate.getUsername().equals(userDetails.getUsername()) && encoder.matches(userUpdate.getPassword(), userDetails.getPassword())) {
+            JwtDao jwtDao = jwtRepository.findByUserDao(userDao);
+            if (jwtDao != null) {
+                userDao.setJwtDao(null);
+                userRepository.save(userDao);
+                jwtRepository.delete(jwtDao);
+            }
+
+
+            if (userUpdate.getNewUsername() != null) {
+                userDao.setUsername(userUpdate.getNewUsername());
+            }
+
+            if (userUpdate.getNewPassword() != null) {
+                userDao.setPassword(bcryptEncoder.encode(userUpdate.getNewPassword()));
+            }
+
+            userDao.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            userRepository.save(userDao);
+
+            final UserDetails userDetails2 = userDetailsService.loadUserByUsername(userDao.getUsername());
+
+            final String token = jwtTokenUtil.generateToken(userDetails2);
+
+            Boolean tokenSaved = userDetailsService.saveToken(token, userDao.getUsername());
+
+            UserUpdateResponse userUpdateResponse = new UserUpdateResponse();
+            userUpdateResponse.setToken(token);
+            userUpdateResponse.setSuccessfully(tokenSaved);
+
+            return userUpdateResponse;
+
+        } else {
+            return null;
+        }
+    }
+
+    public UserUpdateResponse updateByAdmin(UserUpdate userUpdate) {
+        UserDao userDao = userRepository.findById(userUpdate.getUserId());
+        System.out.println(userDao.getUsername());
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(userUpdate.getUsername());
+        if (userUpdate.getUsername().equals(userDetails.getUsername()) && encoder.matches(userUpdate.getPassword(), userDetails.getPassword())) {
+            JwtDao jwtDao = jwtRepository.findByUserDao(userDao);
+            if (jwtDao != null) {
+                userDao.setJwtDao(null);
+                userRepository.save(userDao);
+                jwtRepository.delete(jwtDao);
+            }
+
+
+            if (userUpdate.getNewUsername() != null) {
+                userDao.setUsername(userUpdate.getNewUsername());
+            }
+
+            if (userUpdate.getNewPassword() != null) {
+                userDao.setPassword(bcryptEncoder.encode(userUpdate.getNewPassword()));
+            }
+
+            userDao.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+            userRepository.save(userDao);
+
+            final UserDetails userDetails2 = userDetailsService.loadUserByUsername(userDao.getUsername());
+
+            final String token = jwtTokenUtil.generateToken(userDetails2);
+
+            Boolean tokenSaved = userDetailsService.saveToken(token, userDao.getUsername());
+
+            UserUpdateResponse userUpdateResponse = new UserUpdateResponse();
+            userUpdateResponse.setToken(token);
+            userUpdateResponse.setSuccessfully(tokenSaved);
+
+            return userUpdateResponse;
+
+        } else {
+            return null;
+        }
+    }
+
+    public UserDao delete(UserUpdate userUpdate) {
+        UserDao userDao = userRepository.findById(userUpdate.getUserId());
+        JwtDao jwtDao = jwtRepository.findByUserDao(userDao);
+        if (jwtDao != null) {
+            userDao.setJwtDao(null);
+            userRepository.save(userDao);
+            jwtRepository.delete(jwtDao);
+        }
+        StatusDao statusDao = statusRepository.findByName("DELETED");
+        userDao.setStatusDao(statusDao);
+        userRepository.save(userDao);
+        return userDao;
+    }
+
 
     @EventListener
     public void appReady(ApplicationReadyEvent event) {
@@ -86,7 +201,7 @@ public class UserService {
         addAdmin.setPassword(bcryptEncoder.encode("1234"));
         addAdmin.setRoleDao(roleDao);
         addAdmin.setStatusDao(statusDao);
-        userDao.save(addAdmin);
+        userRepository.save(addAdmin);
     }
 
 }
