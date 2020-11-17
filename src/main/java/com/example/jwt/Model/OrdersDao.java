@@ -14,20 +14,32 @@ public class OrdersDao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
 
-    @Column(name = "product_id")
-    long productId;
+    @ManyToOne
+    @JoinColumn(name = "products_id", referencedColumnName = "id")
+    ProductsDao productsId;
 
     @Column
     int amount;
 
-    @Column(name = "shopper_id")
-    long shopperId;
+    @ManyToOne
+    @JoinColumn(name = "shopper_id", referencedColumnName = "id")
+    UserDao shopper_id;
 
     @Column
     int price;
 
-    @Column(name = "owner_id")
-    long ownerId;
+    @Column
+    String address;
+
+    @Column
+    int phone;
+
+    @Column(name = "postal_code")
+    int postalCode;
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id", referencedColumnName = "owner_id")
+    ProductsDao ownerId;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -39,10 +51,106 @@ public class OrdersDao {
     private Timestamp updatedAt;
 
     @ManyToOne()
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    @JoinColumn(name = "order_status_id", referencedColumnName = "id")
     @JsonIgnore
-    private StatusDao statusDao;
+    private OrderStatusDao orderStatusDao;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public ProductsDao getProductsId() {
+        return productsId;
+    }
+
+    public void setProductsId(ProductsDao productsId) {
+        this.productsId = productsId;
+    }
+
+    public UserDao getShopper_id() {
+        return shopper_id;
+    }
+
+    public void setShopper_id(UserDao shopper_id) {
+        this.shopper_id = shopper_id;
+    }
+
+    public ProductsDao getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(ProductsDao ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public int getPhone() {
+        return phone;
+    }
+
+    public void setPhone(int phone) {
+        this.phone = phone;
+    }
+
+    public int getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(int postalCode) {
+        this.postalCode = postalCode;
+    }
 
 
 
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public OrderStatusDao getOrderStatusDao() {
+        return orderStatusDao;
+    }
+
+    public void setOrderStatusDao(OrderStatusDao orderStatusDao) {
+        this.orderStatusDao = orderStatusDao;
+    }
 }

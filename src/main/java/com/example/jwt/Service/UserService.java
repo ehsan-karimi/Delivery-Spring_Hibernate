@@ -177,11 +177,13 @@ public class UserService {
         listStatus.add("NOT_ACTIVE");
         listStatus.add("DELETED");
         listStatus.add("ACTIVE_PRODUCT");
+        listStatus.add("ALL_SOLD_OUT");
         List<String> listStatusDescription = new ArrayList<>();
         listStatusDescription.add("Have Token");
         listStatusDescription.add("WithOut Token");
         listStatusDescription.add("Deleted Logically");
         listStatusDescription.add("Product Exist");
+        listStatusDescription.add("All Products Were Sold");
 
         for (int a = 0; a < listStatus.size(); a++) {
             StatusDao statusDao = new StatusDao();

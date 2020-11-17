@@ -112,6 +112,24 @@ public class ProductsService {
 
     }
 
+    public ProductsDao addAmount(String token, ProductDto productDto) {
+        ProductsDao updateProduct = productsRepository.findById(productDto.getId());
+        String name = userRepository.findById(getUserId(token)).getUsername();
+
+        if (updateProduct.getOwnerId() == getUserId(token) || name.equals("Admin")) {
+
+
+            if (productDto.getAmount() > 0) {
+                updateProduct.setAmount(productDto.getAmount());
+            }
+
+
+            return productsRepository.save(updateProduct);
+        } else {
+            return null;
+        }
+    }
+
     private long getUserId(String token) {
         String username = null;
         String jwtToken = null;

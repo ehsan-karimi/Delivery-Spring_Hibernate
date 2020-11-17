@@ -28,7 +28,7 @@ public class ProductsController {
 
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/product/list", method = RequestMethod.GET)
-    public ResponseEntity<?> getUsers(@RequestHeader(value="Authorization") String token) {
+    public ResponseEntity<?> getProducts(@RequestHeader(value="Authorization") String token) {
         return ResponseEntity.ok(productsService.getProductsList(token));
     }
 
@@ -42,6 +42,12 @@ public class ProductsController {
     @RequestMapping(value = "/product/remove", method = RequestMethod.POST)
     public ResponseEntity<?> removeProduct(@RequestHeader(value="Authorization") String token,@RequestBody ProductDto productDto) {
         return ResponseEntity.ok(productsService.delete(token,productDto));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @RequestMapping(value = "/product/addAmount", method = RequestMethod.POST)
+    public ResponseEntity<?> addProductAmount(@RequestHeader(value="Authorization") String token,@RequestBody ProductDto productDto) {
+        return ResponseEntity.ok(productsService.addAmount(token,productDto));
     }
 
 }
