@@ -1,4 +1,4 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.User;
 
 import java.sql.Timestamp;
 import java.util.Date;

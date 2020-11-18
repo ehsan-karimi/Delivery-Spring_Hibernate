@@ -1,11 +1,11 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.User;
 
 public class UserUpdate {
-    String username;
-    String password;
-    String newUsername;
-    String newPassword;
-    long userId;
+    private String username;
+    private String password;
+    private String newUsername;
+    private String newPassword;
+    private long userId;
 
     public long getUserId() {
         return userId;

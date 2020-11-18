@@ -1,5 +1,7 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.Order;
 
+import com.example.jwt.Model.Product.ProductsDao;
+import com.example.jwt.Model.User.UserDao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -14,6 +16,7 @@ public class OrdersDao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
 
+
     @ManyToOne
     @JoinColumn(name = "products_id", referencedColumnName = "id")
     ProductsDao productsId;
@@ -23,7 +26,7 @@ public class OrdersDao {
 
     @ManyToOne
     @JoinColumn(name = "shopper_id", referencedColumnName = "id")
-    UserDao shopper_id;
+    UserDao shopper;
 
     @Column
     int price;
@@ -67,16 +70,26 @@ public class OrdersDao {
         return productsId;
     }
 
+    @PrePersist
+    void createdAt() {
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+    }
+
+    @PreUpdate
+    void updatedAt() {
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
+    }
+
     public void setProductsId(ProductsDao productsId) {
         this.productsId = productsId;
     }
 
-    public UserDao getShopper_id() {
-        return shopper_id;
+    public UserDao getShopper() {
+        return shopper;
     }
 
-    public void setShopper_id(UserDao shopper_id) {
-        this.shopper_id = shopper_id;
+    public void setShopper(UserDao shopper) {
+        this.shopper = shopper;
     }
 
     public ProductsDao getOwnerId() {

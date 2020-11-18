@@ -2,24 +2,23 @@ package com.example.jwt.Service;
 
 import com.example.jwt.Config.JwtTokenUtil;
 import com.example.jwt.Model.*;
+import com.example.jwt.Model.Order.*;
+import com.example.jwt.Model.Product.ProductsDao;
+import com.example.jwt.Model.User.UserDao;
 import com.example.jwt.Repository.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
 public class OrderService {
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder bcryptEncoder;
     @Autowired
     private OrderStatusRepository orderStatusRepository;
     @Autowired
@@ -50,7 +49,7 @@ public class OrderService {
         }
 
         newOrder.setPrice(orderDto.getAmount() * productsDao.getPrice());
-        newOrder.setShopper_id(userDao);
+        newOrder.setShopper(userDao);
         newOrder.setProductsId(productsDao);
         newOrder.setOwnerId(productsDao);
         newOrder.setAmount(orderDto.getAmount());
@@ -75,12 +74,55 @@ public class OrderService {
         return orderRepository.save(insertedOrder);
     }
 
+    public OrdersDao addOrderStatus(String token, OrderDto orderDto) {
+        String name = userRepository.findById(getUserId(token)).getUsername();
+        if (!name.equals("Admin")) {
+            return null;
+        }
+
+
+        OrdersDao ordersDao = orderRepository.findById(orderDto.getIdOrder());
+        OrderStatusDao orderStatusDao = orderStatusRepository.findByOrdersDao(ordersDao);
+        if (orderStatusDao.getStatusDao().getName().equals("DELIVERED_ORDER") || orderStatusDao.getStatusDao().getName().equals("CANCELED_ORDER")) {
+            return null;
+        }
+
+        OrderStatusDao newOrderStatus = new OrderStatusDao();
+        StatusDao statusDao;
+        switch (orderStatusDao.getStatusDao().getName()) {
+            case "WAITING_ORDER":
+                statusDao = statusRepository.findByName("PACKING_ORDER");
+                newOrderStatus.setStatusDao(statusDao);
+                newOrderStatus.setOrdersDao(ordersDao);
+                break;
+
+            case "PACKING_ORDER":
+                statusDao = statusRepository.findByName("DELIVERING_ORDER");
+                newOrderStatus.setStatusDao(statusDao);
+                newOrderStatus.setOrdersDao(ordersDao);
+                break;
+
+            case "DELIVERING_ORDER":
+                statusDao = statusRepository.findByName("DELIVERED_ORDER");
+                newOrderStatus.setStatusDao(statusDao);
+                newOrderStatus.setOrdersDao(ordersDao);
+                break;
+
+        }
+
+
+        ordersDao.setOrderStatusDao(orderStatusRepository.save(newOrderStatus));
+
+        return orderRepository.save(ordersDao);
+    }
 
     public OrdersDao update(String token, OrderDto orderDto) {
         OrdersDao ordersDao = orderRepository.findById(orderDto.getIdOrder());
+        System.out.println(orderDto.getProductId());
+        System.out.println(ordersDao);
         ProductsDao productsDao = productsRepository.findById(orderDto.getProductId());
         String name = userRepository.findById(getUserId(token)).getUsername();
-        if (ordersDao.getShopper_id().getId() == getUserId(token) || name.equals("Admin")) {
+        if (ordersDao.getShopper().getId() == getUserId(token) || name.equals("Admin")) {
             if (orderDto.getAmount() > 0) {
                 int originalAmount = ordersDao.getAmount() + productsDao.getAmount();
                 int amount = originalAmount - orderDto.getAmount();
@@ -122,12 +164,12 @@ public class OrderService {
         }
     }
 
-    public OrderStatusDao remove(String token, OrderDto orderDto) {
+    public OrdersDao remove(String token, OrderDto orderDto) {
         String name = userRepository.findById(getUserId(token)).getUsername();
         OrdersDao ordersDao = orderRepository.findById(orderDto.getIdOrder());
-        if (ordersDao.getShopper_id().getId() == getUserId(token) || name.equals("Admin")) {
+        if (ordersDao.getShopper().getId() == getUserId(token) || name.equals("Admin")) {
             ProductsDao productsDao = productsRepository.findById(ordersDao.getProductsId().getId());
-            StatusDao statusDao = statusRepository.findByName("CANCEL_PRODUCT");
+            StatusDao statusDao = statusRepository.findByName("CANCELED_ORDER");
 
             OrderStatusDao newOrderStatus = new OrderStatusDao();
             newOrderStatus.setOrdersDao(ordersDao);
@@ -141,15 +183,16 @@ public class OrderService {
             productsDao.setAmount(ordersDao.getAmount() + productsDao.getAmount());
             productsRepository.save(productsDao);
 
+            ordersDao.setOrderStatusDao(orderStatusRepository.save(newOrderStatus));
 
-            return orderStatusRepository.save(newOrderStatus);
+            return orderRepository.save(ordersDao);
         } else {
             return null;
         }
 
     }
 
-    public List getOrdersList(String token){
+    public List getOrdersList(String token) {
 
         String name = userRepository.findById(getUserId(token)).getUsername();
         List<OrdersList<Long, ProductsDao, Integer, UserDao, Integer, String, Integer, Integer, Timestamp, Timestamp, OrderStatusDao>> listProduct = new ArrayList<>();
@@ -157,33 +200,41 @@ public class OrderService {
             Iterable<OrdersDao> iterable = orderRepository.findAll();
 
             iterable.forEach(s -> {
-                listProduct.add(new OrdersList(s.getId(), s.getProductsId(), s.getAmount(), s.getShopper_id(), s.getPrice(), s.getAddress(), s.getPhone(), s.getPostalCode(), s.getCreatedAt(), s.getUpdatedAt(), s.getOrderStatusDao()));
+                listProduct.add(new OrdersList(s.getId(), s.getProductsId(), s.getAmount(), s.getShopper(), s.getPrice(), s.getAddress(), s.getPhone(), s.getPostalCode(), s.getCreatedAt(), s.getUpdatedAt(), s.getOrderStatusDao()));
             });
             return listProduct;
-        }else {
+        } else {
             UserDao userDao = userRepository.findById(getUserId(token));
-            Iterable<OrdersDao> iterable = orderRepository.findAllByShopper_id(userDao);
+            Iterable<OrdersDao> iterable = orderRepository.findAllByShopper(userDao);
 
             iterable.forEach(s -> {
-                listProduct.add(new OrdersList(s.getId(), s.getProductsId(), s.getAmount(), s.getShopper_id(), s.getPrice(), s.getAddress(), s.getPhone(), s.getPostalCode(), s.getCreatedAt(), s.getUpdatedAt(), s.getOrderStatusDao()));
+                listProduct.add(new OrdersList(s.getId(), s.getProductsId(), s.getAmount(), s.getShopper(), s.getPrice(), s.getAddress(), s.getPhone(), s.getPostalCode(), s.getCreatedAt(), s.getUpdatedAt(), s.getOrderStatusDao()));
             });
             return listProduct;
         }
 
     }
 
-//    public ProductsDao save(String token, ProductDto productDto) {
-//        ProductsDao newProduct = new ProductsDao();
-//        StatusDao statusDao = statusRepository.findByName("ACTIVE_PRODUCT");
-//        newProduct.setName(productDto.getName());
-//        newProduct.setPrice(productDto.getPrice());
-//        newProduct.setAmount(productDto.getAmount());
-//        newProduct.setTagId(tagRepository.findById(productDto.getTagId()));
-//        newProduct.setOwnerId(getUserId(token));
-//        newProduct.setStatusDao(statusDao);
-//
-//        return productsRepository.save(newProduct);
-//    }
+    public List orderStatusList(String token, long id) {
+        OrdersDao ordersDao = orderRepository.findById(id);
+        System.out.println(ordersDao.getProductsId().getName());
+        String name = userRepository.findById(getUserId(token)).getUsername();
+        if (ordersDao.getShopper().getId() == getUserId(token) || name.equals("Admin")) {
+            Iterable<OrderStatusDao> iterable = orderStatusRepository.findAllByOrdersDao(ordersDao);
+
+            List<OrderStatusList<String, Timestamp>> listOrderStatus = new ArrayList<>();
+
+            iterable.forEach(s -> {
+                listOrderStatus.add(new OrderStatusList<>(s.getStatusDao().getName(), s.getCreatedAt()));
+            });
+
+            return listOrderStatus;
+        } else {
+            return null;
+        }
+
+    }
+
 
     private long getUserId(String token) {
         String username = null;

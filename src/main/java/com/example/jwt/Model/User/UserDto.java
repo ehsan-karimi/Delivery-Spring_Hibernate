@@ -1,4 +1,4 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.User;
 
 public class UserDto {
     private String username;

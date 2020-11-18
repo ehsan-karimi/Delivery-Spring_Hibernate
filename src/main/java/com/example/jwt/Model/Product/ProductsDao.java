@@ -1,15 +1,19 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.Product;
 
+import com.example.jwt.Model.StatusDao;
+import com.example.jwt.Model.TagDao;
+import com.example.jwt.Model.User.UserDao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "products")
-public class ProductsDao {
+public class ProductsDao implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -22,15 +26,28 @@ public class ProductsDao {
     @JoinColumn(name = "tag_id", referencedColumnName = "id")
     private TagDao tagId;
 
-    @Column(name = "owner_id")
-    @JsonIgnore
-    private long ownerId;
+//    @Column(name = "owner_id")
+//    @JsonIgnore
+//    private long ownerId;
+//
+//    public long getOwnerId() {
+//        return ownerId;
+//    }
+//
+//    public void setOwnerId(long ownerId) {
+//        this.ownerId = ownerId;
+//    }
 
-    public long getOwnerId() {
+    @ManyToOne
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
+    @JsonIgnore
+    private UserDao ownerId;
+
+    public UserDao getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(long ownerId) {
+    public void setOwnerId(UserDao ownerId) {
         this.ownerId = ownerId;
     }
 

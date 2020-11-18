@@ -1,17 +1,11 @@
 package com.example.jwt.Controller;
 
-import com.example.jwt.Model.ProductDto;
-import com.example.jwt.Model.ProductsDao;
-import com.example.jwt.Model.UserDto;
-import com.example.jwt.Model.UserUpdate;
-import com.example.jwt.Service.JwtUserDetailsService;
+import com.example.jwt.Model.Product.ProductDto;
 import com.example.jwt.Service.ProductsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @CrossOrigin()
@@ -48,6 +42,17 @@ public class ProductsController {
     @RequestMapping(value = "/product/addAmount", method = RequestMethod.POST)
     public ResponseEntity<?> addProductAmount(@RequestHeader(value="Authorization") String token,@RequestBody ProductDto productDto) {
         return ResponseEntity.ok(productsService.addAmount(token,productDto));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @RequestMapping(value = "/product/{id}/orders", method = RequestMethod.GET)
+    public ResponseEntity<?> orderStatusList(@RequestHeader(value="Authorization") String token,@PathVariable(value = "id") int productId) {
+        return ResponseEntity.ok(productsService.orderList(token, productId));
+    }
+
+    @RequestMapping(value = "/product/search", method = RequestMethod.GET)
+    public ResponseEntity<?> search(@RequestParam String tag) {
+        return ResponseEntity.ok(productsService.search(tag));
     }
 
 }

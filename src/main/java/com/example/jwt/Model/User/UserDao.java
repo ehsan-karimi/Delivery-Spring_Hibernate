@@ -1,17 +1,19 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.User;
 
+import com.example.jwt.Model.Jwt.JwtDao;
+import com.example.jwt.Model.RoleDao;
+import com.example.jwt.Model.StatusDao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.sql.Date;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "User")
 public class UserDao {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
@@ -54,16 +56,16 @@ public class UserDao {
         this.jwtDao = jwtDao;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
     public long getId() {
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 
     public void setCreatedAt(Timestamp createdAt) {

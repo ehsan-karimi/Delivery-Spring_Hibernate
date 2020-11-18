@@ -1,4 +1,7 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.Jwt;
+
+import com.example.jwt.Model.StatusDao;
+import com.example.jwt.Model.User.UserDao;
 
 import javax.persistence.*;
 

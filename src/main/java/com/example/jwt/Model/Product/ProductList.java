@@ -1,20 +1,24 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.Product;
+
+import com.example.jwt.Model.StatusDao;
+import com.example.jwt.Model.TagDao;
+import com.example.jwt.Model.User.UserDao;
 
 import java.sql.Timestamp;
 import java.util.Date;
 
-public class ProductList<L extends Number, S, T, S1, I extends Number, L1 extends Number, I1 extends Number, T1 extends Date, T2 extends Date> {
+public class ProductList<L extends Number, S, T, S1, I extends Number, U, I1 extends Number, T1 extends Date, T2 extends Date> {
     long id;
     String name;
     TagDao tagDao;
     StatusDao statusDao;
     int price;
-    long ownerId;
+    UserDao ownerId;
     int amount;
     Timestamp created_at;
     Timestamp updated_at;
 
-    public ProductList(long id, String name, TagDao tagDao, StatusDao statusDao, int price, long ownerId, int amount, Timestamp created_at, Timestamp updated_at) {
+    public ProductList(long id, String name, TagDao tagDao, StatusDao statusDao, int price, UserDao ownerId, int amount, Timestamp created_at, Timestamp updated_at) {
         this.id = id;
         this.name = name;
         this.tagDao = tagDao;
@@ -46,7 +50,7 @@ public class ProductList<L extends Number, S, T, S1, I extends Number, L1 extend
         return price;
     }
 
-    public long getOwnerId() {
+    public UserDao getOwnerId() {
         return ownerId;
     }
 

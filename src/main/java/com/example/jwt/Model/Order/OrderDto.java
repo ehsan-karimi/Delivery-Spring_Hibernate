@@ -1,4 +1,4 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.Order;
 
 public class OrderDto {
     long productId;
@@ -6,6 +6,7 @@ public class OrderDto {
     String address;
     int phone;
     int postalCode;
+    long idOrder;
 
     public long getIdOrder() {
         return idOrder;
@@ -15,7 +16,7 @@ public class OrderDto {
         this.idOrder = idOrder;
     }
 
-    long idOrder;
+
 
     public long getProductId() {
         return productId;

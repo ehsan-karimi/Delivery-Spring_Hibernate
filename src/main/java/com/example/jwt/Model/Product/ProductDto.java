@@ -1,4 +1,4 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.Product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;

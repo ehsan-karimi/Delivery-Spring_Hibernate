@@ -2,11 +2,15 @@ package com.example.jwt.Service;
 
 import com.example.jwt.Config.JwtTokenUtil;
 import com.example.jwt.Model.*;
+import com.example.jwt.Model.Order.OrdersDao;
+import com.example.jwt.Model.Product.ProductDto;
+import com.example.jwt.Model.Product.ProductList;
+import com.example.jwt.Model.Product.ProductsDao;
+import com.example.jwt.Model.User.UserDao;
 import com.example.jwt.Repository.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -19,10 +23,6 @@ public class ProductsService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private PasswordEncoder bcryptEncoder;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
     private StatusRepository statusRepository;
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
@@ -31,7 +31,7 @@ public class ProductsService {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
-    private JwtUserDetailsService userDetailsService;
+    private OrderRepository orderRepository;
     @Autowired
     private ProductsRepository productsRepository;
 
@@ -42,7 +42,7 @@ public class ProductsService {
         newProduct.setPrice(productDto.getPrice());
         newProduct.setAmount(productDto.getAmount());
         newProduct.setTagId(tagRepository.findById(productDto.getTagId()));
-        newProduct.setOwnerId(getUserId(token));
+        newProduct.setOwnerId(userRepository.findById(getUserId(token)));
         newProduct.setStatusDao(statusDao);
 
         return productsRepository.save(newProduct);
@@ -50,7 +50,7 @@ public class ProductsService {
 
     public List getProductsList(String token) {
         String name = userRepository.findById(getUserId(token)).getUsername();
-        List<ProductList<Long, String, TagDao, StatusDao, Integer, Long, Integer, Timestamp, Timestamp>> listProduct = new ArrayList<>();
+        List<ProductList<Long, String, TagDao, StatusDao, Integer, UserDao, Integer, Timestamp, Timestamp>> listProduct = new ArrayList<>();
         if (name.equals("Admin")) {
             Iterable<ProductsDao> iterable = productsRepository.findAll();
 
@@ -58,12 +58,12 @@ public class ProductsService {
                 listProduct.add(new ProductList(s.getId(), s.getName(), s.getTagId(), s.getStatusDao(), s.getPrice(), s.getOwnerId(), s.getAmount(), s.getCreatedAt(), s.getUpdatedAt()));
             });
             return listProduct;
-        }else {
+        } else {
             StatusDao statusDao = statusRepository.findByName("ACTIVE_PRODUCT");
             Iterable<ProductsDao> iterable = productsRepository.findAllByStatusDao(statusDao);
 
             iterable.forEach(s -> {
-                listProduct.add(new ProductList(s.getId(), s.getName(), s.getTagId(), s.getStatusDao(), s.getPrice(), 0, s.getAmount(), s.getCreatedAt(), s.getUpdatedAt()));
+                listProduct.add(new ProductList(s.getId(), s.getName(), s.getTagId(), s.getStatusDao(), s.getPrice(), null, s.getAmount(), s.getCreatedAt(), s.getUpdatedAt()));
             });
             return listProduct;
         }
@@ -73,7 +73,7 @@ public class ProductsService {
         ProductsDao updateProduct = productsRepository.findById(productDto.getId());
         String name = userRepository.findById(getUserId(token)).getUsername();
 
-        if (updateProduct.getOwnerId() == getUserId(token) || name.equals("Admin")) {
+        if (updateProduct.getOwnerId().getId() == getUserId(token) || name.equals("Admin")) {
             if (productDto.getName() != null) {
                 updateProduct.setName(productDto.getName());
             }
@@ -97,16 +97,16 @@ public class ProductsService {
         }
     }
 
-    public ProductsDao delete(String token,ProductDto productDto) {
+    public ProductsDao delete(String token, ProductDto productDto) {
         ProductsDao deleteProduct = productsRepository.findById(productDto.getId());
         String name = userRepository.findById(getUserId(token)).getUsername();
 
-        if (deleteProduct.getOwnerId() == getUserId(token) || name.equals("Admin")) {
+        if (deleteProduct.getOwnerId().getId() == getUserId(token) || name.equals("Admin")) {
             StatusDao statusDao = statusRepository.findByName("DELETED");
             deleteProduct.setStatusDao(statusDao);
             productsRepository.save(deleteProduct);
             return deleteProduct;
-        }else {
+        } else {
             return null;
         }
 
@@ -116,7 +116,7 @@ public class ProductsService {
         ProductsDao updateProduct = productsRepository.findById(productDto.getId());
         String name = userRepository.findById(getUserId(token)).getUsername();
 
-        if (updateProduct.getOwnerId() == getUserId(token) || name.equals("Admin")) {
+        if (updateProduct.getOwnerId().getId() == getUserId(token) || name.equals("Admin")) {
 
 
             if (productDto.getAmount() > 0) {
@@ -155,6 +155,26 @@ public class ProductsService {
             System.out.println(userDao.getId());
         }
         return userDao.getId();
+    }
+
+    public List orderList(String token, long id) {
+        ProductsDao productsDao = productsRepository.findById(id);
+        List<OrdersDao> ordersDao = orderRepository.findAllByProductsId(productsDao);
+
+        String name = userRepository.findById(getUserId(token)).getUsername();
+        if (productsDao.getOwnerId().getId() == getUserId(token) || name.equals("Admin")) {
+            return ordersDao;
+        } else {
+            return null;
+        }
+
+    }
+
+    public List search(String tag) {
+
+        List<ProductsDao> productsDao = productsRepository.findAllByTagId(tagRepository.findByName(tag));
+        return productsDao;
+
     }
 
 

@@ -1,5 +1,6 @@
-package com.example.jwt.Model;
+package com.example.jwt.Model.Order;
 
+import com.example.jwt.Model.StatusDao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 
