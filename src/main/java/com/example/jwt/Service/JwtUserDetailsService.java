@@ -51,7 +51,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         UserDao userDao = userRepository.findByUsername(username);
         StatusDao statusDeleted = statusRepository.findByName("DELETED");
 
-        if (statusDeleted != userDao.getStatusDao()) {
+        if (statusDeleted != userDao.getStatusDao() && userDao.getJwtDao() == null) {
             StatusDao statusDao = statusRepository.findByName("ACTIVE");
             JwtDao jwtDao = new JwtDao();
             jwtDao.setStatusDao(statusDao);
@@ -63,6 +63,8 @@ public class JwtUserDetailsService implements UserDetailsService {
 
             userDao.setJwtDao(jwtDao);
             userDao.setStatusDao(statusDao);
+        }else {
+            return false;
         }
 
 

@@ -11,5 +11,5 @@ public interface ProductsRepository extends CrudRepository<ProductsDao, Integer>
     ProductsDao findById(long id);
     Iterable<ProductsDao> findAllByStatusDao(StatusDao statusDao);
     List<ProductsDao> findAllByOwnerId(UserDao id);
-    List<ProductsDao> findAllByTagId(TagDao id);
+    List<ProductsDao> findAllByTagIdAndStatusDao(TagDao id, StatusDao status);
 }

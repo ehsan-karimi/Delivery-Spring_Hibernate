@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -58,7 +59,7 @@ public class OrderService {
         newOrder.setPrice(orderDto.getAmount() * productsDao.getPrice());
         newOrder.setShopper(userDao);
         newOrder.setProductsId(productsDao);
-        newOrder.setOwnerId(productsDao);
+      //  newOrder.setOwnerId(productsDao);
         newOrder.setAmount(orderDto.getAmount());
         newOrder.setAddress(orderDto.getAddress());
         newOrder.setPhone(orderDto.getPhone());
@@ -67,7 +68,7 @@ public class OrderService {
 
         OrderStatusDao orderStatusDao = new OrderStatusDao();
         // find status (WAITING)
-        StatusDao statusDao = statusRepository.findByName("WAITING");
+        StatusDao statusDao = statusRepository.findByName("WAITING_ORDER");
         // set status to orderStatusDao model and set order id to orderStatusDao model and add to database (it is order status)
         orderStatusDao.setStatusDao(statusDao);
         orderStatusDao.setOrdersDao(insertedOrder);
@@ -85,9 +86,9 @@ public class OrderService {
         // find order using order id
         OrdersDao ordersDao = orderRepository.findById(orderDto.getIdOrder());
         // find order status using order id
-        OrderStatusDao orderStatusDao = orderStatusRepository.findByOrdersDao(ordersDao);
+        List<OrderStatusDao> orderStatusDao = orderStatusRepository.findByOrdersDao(ordersDao);
         // check if status equal with DELIVERED_ORDER or CANCELED_ORDER return response (cant add order status when status is DELIVERED_ORDER or CANCELED_ORDER)
-        if (orderStatusDao.getStatusDao().getName().equals("DELIVERED_ORDER") || orderStatusDao.getStatusDao().getName().equals("CANCELED_ORDER")) {
+        if (orderStatusDao.get(orderStatusDao.size() - 1).getStatusDao().getName().equals("DELIVERED_ORDER") || orderStatusDao.get(orderStatusDao.size() - 1).getStatusDao().getName().equals("CANCELED_ORDER")) {
             // create and return new response if Information received is wrong
             Response response = new Response();
             response.setMessage("You cant add order status when last status is DELIVERED_ORDER or CANCELED_ORDER");
@@ -96,7 +97,7 @@ public class OrderService {
         // find status and replace new to older
         OrderStatusDao newOrderStatus = new OrderStatusDao();
         StatusDao statusDao;
-        switch (orderStatusDao.getStatusDao().getName()) {
+        switch (orderStatusDao.get(orderStatusDao.size() - 1).getStatusDao().getName()) {
             case "WAITING_ORDER":
                 statusDao = statusRepository.findByName("PACKING_ORDER");
                 newOrderStatus.setStatusDao(statusDao);
@@ -125,6 +126,12 @@ public class OrderService {
     public ResponseEntity<?> update(String token, OrderDto orderDto) {
         // find order using order id
         OrdersDao ordersDao = orderRepository.findById(orderDto.getIdOrder());
+        if (ordersDao == null){
+            // create and return new response if Information received is wrong
+            Response response = new Response();
+            response.setMessage("Order not exist");
+            return ResponseEntity.ok(response);
+        }
         // find product using product id
         ProductsDao productsDao = productsRepository.findById(orderDto.getProductId());
         // find username using token
@@ -186,6 +193,12 @@ public class OrderService {
         String name = userRepository.findById(getUserId(token)).getUsername();
         // find order using order id
         OrdersDao ordersDao = orderRepository.findById(orderDto.getIdOrder());
+        if (ordersDao == null){
+            // create and return new response if Information received is wrong
+            Response response = new Response();
+            response.setMessage("Order not exist");
+            return ResponseEntity.ok(response);
+        }
         // Check user information with received information so that the user can remove logically his/her own order (admin have access to all orders)
         if (ordersDao.getShopper().getId() == getUserId(token) || name.equals("Admin")) {
             // find product using product id
@@ -221,12 +234,12 @@ public class OrderService {
     public List getOrdersList(String token) {
 
         String name = userRepository.findById(getUserId(token)).getUsername();
-        List<OrdersList<Long, ProductsDao, Integer, UserDao, Integer, String, Integer, Integer, Timestamp, Timestamp, OrderStatusDao>> listProduct = new ArrayList<>();
+        List<OrdersList<Long, Long, Integer, String, Integer, String, Integer, Integer, Timestamp, Timestamp, String>> listProduct = new ArrayList<>();
         if (name.equals("Admin")) {
             Iterable<OrdersDao> iterable = orderRepository.findAll();
 
             iterable.forEach(s -> {
-                listProduct.add(new OrdersList(s.getId(), s.getProductsId(), s.getAmount(), s.getShopper(), s.getPrice(), s.getAddress(), s.getPhone(), s.getPostalCode(), s.getCreatedAt(), s.getUpdatedAt(), s.getOrderStatusDao()));
+                listProduct.add(new OrdersList(s.getId(), s.getProductsId().getId(), s.getAmount(), s.getShopper().getUsername(), s.getPrice(), s.getAddress(), s.getPhone(), s.getPostalCode(), s.getCreatedAt(), s.getUpdatedAt(), s.getOrderStatusDao().getStatusDao().getName()));
             });
             return listProduct;
         } else {
@@ -234,7 +247,7 @@ public class OrderService {
             Iterable<OrdersDao> iterable = orderRepository.findAllByShopper(userDao);
 
             iterable.forEach(s -> {
-                listProduct.add(new OrdersList(s.getId(), s.getProductsId(), s.getAmount(), s.getShopper(), s.getPrice(), s.getAddress(), s.getPhone(), s.getPostalCode(), s.getCreatedAt(), s.getUpdatedAt(), s.getOrderStatusDao()));
+                listProduct.add(new OrdersList(s.getId(), s.getProductsId().getId(), s.getAmount(), s.getShopper().getUsername(), s.getPrice(), s.getAddress(), s.getPhone(), s.getPostalCode(), s.getCreatedAt(), s.getUpdatedAt(), s.getOrderStatusDao().getStatusDao().getName()));
             });
             return listProduct;
         }

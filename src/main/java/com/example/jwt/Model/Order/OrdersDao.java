@@ -19,6 +19,7 @@ public class OrdersDao {
 
     @ManyToOne
     @JoinColumn(name = "products_id", referencedColumnName = "id")
+    @JsonIgnore
     ProductsDao productsId;
 
     @Column
@@ -26,6 +27,7 @@ public class OrdersDao {
 
     @ManyToOne
     @JoinColumn(name = "shopper_id", referencedColumnName = "id")
+    @JsonIgnore
     UserDao shopper;
 
     @Column
@@ -40,9 +42,10 @@ public class OrdersDao {
     @Column(name = "postal_code")
     int postalCode;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", referencedColumnName = "owner_id")
-    ProductsDao ownerId;
+//    @ManyToOne
+//    @JoinColumn(name = "owner_id")
+//    @JsonIgnore
+//    ProductsDao ownerId;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -53,7 +56,7 @@ public class OrdersDao {
     @JsonIgnore
     private Timestamp updatedAt;
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_status_id", referencedColumnName = "id")
     @JsonIgnore
     private OrderStatusDao orderStatusDao;
@@ -64,6 +67,10 @@ public class OrdersDao {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getProductId() {
+        return productsId.getId();
     }
 
     public ProductsDao getProductsId() {
@@ -84,6 +91,10 @@ public class OrdersDao {
         this.productsId = productsId;
     }
 
+    public String getShopperName() {
+        return shopper.getUsername();
+    }
+
     public UserDao getShopper() {
         return shopper;
     }
@@ -92,13 +103,13 @@ public class OrdersDao {
         this.shopper = shopper;
     }
 
-    public ProductsDao getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(ProductsDao ownerId) {
-        this.ownerId = ownerId;
-    }
+//    public ProductsDao getOwnerId() {
+//        return ownerId;
+//    }
+//
+//    public void setOwnerId(ProductsDao ownerId) {
+//        this.ownerId = ownerId;
+//    }
 
     public int getAmount() {
         return amount;
@@ -161,6 +172,10 @@ public class OrdersDao {
 
     public OrderStatusDao getOrderStatusDao() {
         return orderStatusDao;
+    }
+
+    public String getOrderStatusName() {
+        return orderStatusDao.getStatusDao().getName();
     }
 
     public void setOrderStatusDao(OrderStatusDao orderStatusDao) {

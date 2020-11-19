@@ -15,7 +15,7 @@ public class OrderStatusDao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private long id;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     @JsonIgnore
     private OrdersDao ordersDao;

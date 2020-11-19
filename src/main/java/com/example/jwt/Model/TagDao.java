@@ -7,9 +7,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "tbl_tag")
 public class TagDao {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     private int id;
     @Column
     private String name;

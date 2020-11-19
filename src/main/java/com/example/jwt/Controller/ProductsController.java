@@ -46,7 +46,7 @@ public class ProductsController {
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/product/addAmount", method = RequestMethod.POST)
     public ResponseEntity<?> addProductAmount(@RequestHeader(value="Authorization") String token,@RequestBody ProductDto productDto) {
-        return ResponseEntity.ok(productsService.addAmount(token,productDto));
+        return productsService.addAmount(token,productDto);
     }
 
     // get list of orders of product
@@ -62,4 +62,9 @@ public class ProductsController {
         return ResponseEntity.ok(productsService.search(tag));
     }
 
+    // get tags list
+    @RequestMapping(value = "/product/tag", method = RequestMethod.GET)
+    public ResponseEntity<?> tagsList() {
+        return ResponseEntity.ok(productsService.tagsList());
+    }
 }

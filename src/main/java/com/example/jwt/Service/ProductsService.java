@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -56,13 +57,13 @@ public class ProductsService {
     public List getProductsList(String token) {
         // find username using token
         String name = userRepository.findById(getUserId(token)).getUsername();
-        List<ProductList<Long, String, TagDao, StatusDao, Integer, UserDao, Integer, Timestamp, Timestamp>> listProduct = new ArrayList<>();
+        List<ProductList<Long, String, Integer, String, Integer, String, Integer, Timestamp, Timestamp>> listProduct = new ArrayList<>();
         // check if user is admin return all product
         if (name.equals("Admin")) {
             Iterable<ProductsDao> iterable = productsRepository.findAll();
 
             iterable.forEach(s -> {
-                listProduct.add(new ProductList(s.getId(), s.getName(), s.getTagId(), s.getStatusDao(), s.getPrice(), s.getOwnerId(), s.getAmount(), s.getCreatedAt(), s.getUpdatedAt()));
+                listProduct.add(new ProductList(s.getId(), s.getName(), s.getTagId().getId(), s.getStatusDao().getName(), s.getPrice(), s.getOwnerId().getUsername(), s.getAmount(), s.getCreatedAt(), s.getUpdatedAt()));
             });
             return listProduct;
         } else {
@@ -71,7 +72,7 @@ public class ProductsService {
             Iterable<ProductsDao> iterable = productsRepository.findAllByStatusDao(statusDao);
 
             iterable.forEach(s -> {
-                listProduct.add(new ProductList(s.getId(), s.getName(), s.getTagId(), s.getStatusDao(), s.getPrice(), null, s.getAmount(), s.getCreatedAt(), s.getUpdatedAt()));
+                listProduct.add(new ProductList(s.getId(), s.getName(), s.getTagId().getId(), s.getStatusDao().getName(), s.getPrice(), null, s.getAmount(), s.getCreatedAt(), s.getUpdatedAt()));
             });
             return listProduct;
         }
@@ -186,6 +187,12 @@ public class ProductsService {
     public ResponseEntity<?> ordersList(String token, long id) {
         // find product using product id
         ProductsDao productsDao = productsRepository.findById(id);
+        if (productsDao == null){
+            // create and return new response if Information received is wrong
+            Response response = new Response();
+            response.setMessage("Product not exist");
+            return ResponseEntity.ok(response);
+        }
         // find orders using product id (productsDao model)
         List<OrdersDao> ordersDao = orderRepository.findAllByProductsId(productsDao);
         // find username using token
@@ -203,8 +210,15 @@ public class ProductsService {
 
     // find product using tag and return list of product
     public List search(String tag) {
-        List<ProductsDao> productsDao = productsRepository.findAllByTagId(tagRepository.findByName(tag));
+        StatusDao statusDao = statusRepository.findByName("ACTIVE_PRODUCT");
+        List<ProductsDao> productsDao = productsRepository.findAllByTagIdAndStatusDao(tagRepository.findByName(tag), statusDao);
         return productsDao;
+    }
+
+    // return tags list
+    public List tagsList() {
+        List<TagDao> tagDao = tagRepository.findAll();
+        return tagDao;
     }
 
 }

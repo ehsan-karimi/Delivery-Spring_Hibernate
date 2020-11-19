@@ -24,6 +24,7 @@ public class ProductsDao implements Serializable {
 
     @ManyToOne()
     @JoinColumn(name = "tag_id", referencedColumnName = "id")
+    @JsonIgnore
     private TagDao tagId;
 
 //    @Column(name = "owner_id")
@@ -39,7 +40,7 @@ public class ProductsDao implements Serializable {
 //    }
 
     @ManyToOne
-    @JoinColumn(name = "owner_id", referencedColumnName = "id")
+    @JoinColumn(name = "owner_id", referencedColumnName = "id", unique = false)
     @JsonIgnore
     private UserDao ownerId;
 
@@ -57,6 +58,7 @@ public class ProductsDao implements Serializable {
 
     @ManyToOne()
     @JoinColumn(name = "status_id", referencedColumnName = "id")
+    @JsonIgnore
     private StatusDao statusDao;
 
     @PrePersist
@@ -105,6 +107,10 @@ public class ProductsDao implements Serializable {
         return tagId;
     }
 
+    public int getTag_id() {
+        return tagId.getId();
+    }
+
     public void setTagId(TagDao tagId) {
         this.tagId = tagId;
     }
@@ -135,6 +141,10 @@ public class ProductsDao implements Serializable {
 
     public StatusDao getStatusDao() {
         return statusDao;
+    }
+
+    public String getStatusName() {
+        return statusDao.getName();
     }
 
     public void setStatusDao(StatusDao statusDao) {
