@@ -14,36 +14,42 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+    // add new order using OrderDto model
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/order/add", method = RequestMethod.POST)
     public ResponseEntity<?> saveProduct(@RequestHeader(value="Authorization") String token, @RequestBody OrderDto orderDto) {
-        return ResponseEntity.ok(orderService.save(token,orderDto));
+        return orderService.add(token,orderDto);
     }
 
+    // get list of orders using token
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/order/list", method = RequestMethod.GET)
     public ResponseEntity<?> getProducts(@RequestHeader(value="Authorization") String token) {
         return ResponseEntity.ok(orderService.getOrdersList(token));
     }
 
+    // edit order using OrderDto model
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/order/update", method = RequestMethod.POST)
     public ResponseEntity<?> updateProduct(@RequestHeader(value="Authorization") String token, @RequestBody OrderDto orderDto) {
-        return ResponseEntity.ok(orderService.update(token,orderDto));
+        return orderService.update(token,orderDto);
     }
 
+    // remove logically order using OrderDto model
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/order/remove", method = RequestMethod.POST)
     public ResponseEntity<?> removeProduct(@RequestHeader(value="Authorization") String token,@RequestBody OrderDto orderDto) {
-        return ResponseEntity.ok(orderService.remove(token,orderDto));
+        return orderService.remove(token,orderDto);
     }
 
+    // add order status using OrderDto model
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/order/addOrderStatus", method = RequestMethod.POST)
-    public ResponseEntity<?> addOrderStatus(@RequestHeader(value="Authorization") String token,@RequestBody OrderDto orderDto) {
-        return ResponseEntity.ok(orderService.addOrderStatus(token,orderDto));
+    public ResponseEntity<?> addOrderStatus(@RequestBody OrderDto orderDto) {
+        return orderService.addOrderStatus(orderDto);
     }
 
+    // get list of order status using order id (admin access to all orders)
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/order/{id}/status", method = RequestMethod.GET)
     public ResponseEntity<?> orderStatusList(@RequestHeader(value="Authorization") String token,@PathVariable(value = "id") int orderId) {

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Tag")
+@Table(name = "tbl_tag")
 public class TagDao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "User")
+@Table(name = "tbl_User")
 public class UserDao {
 
     @Id

@@ -8,15 +8,15 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 public class ProductList<L extends Number, S, T, S1, I extends Number, U, I1 extends Number, T1 extends Date, T2 extends Date> {
-    long id;
-    String name;
-    TagDao tagDao;
-    StatusDao statusDao;
-    int price;
-    UserDao ownerId;
-    int amount;
-    Timestamp created_at;
-    Timestamp updated_at;
+    private long id;
+    private String name;
+    private TagDao tagDao;
+    private StatusDao statusDao;
+    private int price;
+    private UserDao ownerId;
+    private int amount;
+    private Timestamp created_at;
+    private Timestamp updated_at;
 
     public ProductList(long id, String name, TagDao tagDao, StatusDao statusDao, int price, UserDao ownerId, int amount, Timestamp created_at, Timestamp updated_at) {
         this.id = id;

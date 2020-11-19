@@ -42,7 +42,7 @@ public class UserController {
         return ResponseEntity.ok(userService.updateByAdmin(user));
     }
 
-    // remove user using user_id (only admin have access)
+    // remove logically user using user_id (only admin have access)
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/user/remove", method = RequestMethod.POST)
     public ResponseEntity<?> removeUserByAdmin(@RequestBody UserUpdate user) {
@@ -52,14 +52,14 @@ public class UserController {
     // get list of user products using user_id (only admin have access)
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/user/{id}/products", method = RequestMethod.GET)
-    public ResponseEntity<?> userProductsList(@RequestHeader(value = "Authorization") String token, @PathVariable(value = "id") int userId) {
+    public ResponseEntity<?> userProductsList(@PathVariable(value = "id") int userId) {
         return ResponseEntity.ok(userService.userProductsList(userId));
     }
 
     // get list of user orders using user_id (only admin have access)
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value = "/user/{id}/orders", method = RequestMethod.GET)
-    public ResponseEntity<?> userOrdersList(@RequestHeader(value = "Authorization") String token, @PathVariable(value = "id") int userId) {
+    public ResponseEntity<?> userOrdersList(@PathVariable(value = "id") int userId) {
         return ResponseEntity.ok(userService.userOrdersList(userId));
     }
 

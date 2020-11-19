@@ -3,7 +3,7 @@ package com.example.jwt.Model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user_roles")
+@Table(name = "tbl_user_roles")
 public class RoleDao {
 
     @Id

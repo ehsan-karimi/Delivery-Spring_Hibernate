@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "products")
+@Table(name = "tbl_products")
 public class ProductsDao implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,14 +43,6 @@ public class ProductsDao implements Serializable {
     @JsonIgnore
     private UserDao ownerId;
 
-    public UserDao getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(UserDao ownerId) {
-        this.ownerId = ownerId;
-    }
-
     @Column
     private int amount;
 
@@ -75,6 +67,14 @@ public class ProductsDao implements Serializable {
     @PreUpdate
     void updatedAt() {
         this.updatedAt = new Timestamp(System.currentTimeMillis());
+    }
+
+    public UserDao getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(UserDao ownerId) {
+        this.ownerId = ownerId;
     }
 
     public long getId() {

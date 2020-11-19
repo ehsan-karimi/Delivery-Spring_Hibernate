@@ -6,7 +6,7 @@ import com.example.jwt.Model.User.UserDao;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user_jwt")
+@Table(name = "tbl_user_jwt")
 public class JwtDao {
 
     @Id

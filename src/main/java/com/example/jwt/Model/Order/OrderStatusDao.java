@@ -10,12 +10,14 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "tbl_order_status")
 public class OrderStatusDao {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private long id;
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @JsonIgnore
     private OrdersDao ordersDao;
     @ManyToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id")
