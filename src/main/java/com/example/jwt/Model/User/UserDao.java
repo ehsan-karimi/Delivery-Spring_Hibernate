@@ -3,12 +3,14 @@ package com.example.jwt.Model.User;
 import com.example.jwt.Model.Jwt.JwtDao;
 import com.example.jwt.Model.RoleDao;
 import com.example.jwt.Model.StatusDao;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+
 
 @Entity
 @Table(name = "tbl_User")
@@ -36,11 +38,13 @@ public class UserDao {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Timestamp createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
     @JsonIgnore
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Timestamp updatedAt;
 
     @OneToOne
@@ -67,6 +71,7 @@ public class UserDao {
     public Timestamp getCreatedAt() {
         return createdAt;
     }
+
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;

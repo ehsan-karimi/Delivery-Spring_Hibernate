@@ -2,13 +2,24 @@ package com.example.jwt.Controller;
 
 import com.example.jwt.Model.Order.OrderDto;
 import com.example.jwt.Service.OrderService;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin()
+@CrossOrigin
+@ApiResponses({
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 401, message = "Unauthorized"),
+        @ApiResponse(code = 403, message = "Forbidden"),
+        @ApiResponse(code = 404, message = "Not Found"),
+        @ApiResponse(code = 415, message = "Unsupported Media Type"),
+        @ApiResponse(code = 422, message = "Unprocessable Entity")
+})
+@RequestMapping(value = "/api")
 public class OrderController {
 
     @Autowired

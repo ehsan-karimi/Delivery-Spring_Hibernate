@@ -2,6 +2,7 @@ package com.example.jwt.Model.Order;
 
 import com.example.jwt.Model.Product.ProductsDao;
 import com.example.jwt.Model.User.UserDao;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -49,11 +50,13 @@ public class OrdersDao {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Timestamp createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
     @JsonIgnore
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Timestamp updatedAt;
 
     @ManyToOne(cascade = CascadeType.ALL)

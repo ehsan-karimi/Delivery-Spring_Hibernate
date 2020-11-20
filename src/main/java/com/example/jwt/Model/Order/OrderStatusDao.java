@@ -1,6 +1,7 @@
 package com.example.jwt.Model.Order;
 
 import com.example.jwt.Model.StatusDao;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -15,7 +16,7 @@ public class OrderStatusDao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private long id;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "id")
     @JsonIgnore
     private OrdersDao ordersDao;
@@ -24,6 +25,7 @@ public class OrderStatusDao {
     private StatusDao statusDao;
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Timestamp createdAt;
 
     @PrePersist

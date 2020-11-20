@@ -29,14 +29,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
-    private static final String[] SWAGGER_URLS = {
-// -- swagger ui
-            "/swagger-resources/**",
-            "/swagger-ui.html",
-            "/v2/api-docs",
-            "/webjars/**"
-    };
-
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         // configure AuthenticationManager so that it knows from where to load
@@ -66,7 +58,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/swagger-resources/**",
                 "/configuration/security",
                 "/swagger-ui.html",
-                "/webjars/**", "/user/authenticate", "/user/register", "/product/search", "/product/tag", "/swagger-ui.html", "/v2/api-docs", "/swagger*/**").permitAll().
+                "/webjars/**",
+                "/user/authenticate",
+                "/user/register",
+                "/product/search",
+                "/product/tag",
+                "/swagger*/**").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to

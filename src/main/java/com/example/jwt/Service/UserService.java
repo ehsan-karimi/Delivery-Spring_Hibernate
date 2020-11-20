@@ -249,77 +249,89 @@ public class UserService {
         return userDao.getId();
     }
 
-//    // insert requirements data to database when we start project
-//    @EventListener
-//    public void appReady(ApplicationReadyEvent event) {
-//        List<String> listRoles = new ArrayList<>();
-//        listRoles.add("ADMIN");
-//        listRoles.add("USER");
-//        List<String> listRolesDescription = new ArrayList<>();
-//        listRolesDescription.add("Full Access");
-//        listRolesDescription.add("Limited Access");
-//
-//        for (int a = 0; a < listRoles.size(); a++) {
-//            RoleDao role = new RoleDao();
-//            role.setName(listRoles.get(a));
-//            role.setDescription(listRolesDescription.get(a));
-//            roleRepository.save(role);
-//        }
-//
-//        List<String> listStatus = new ArrayList<>();
-//        listStatus.add("ACTIVE");
-//        listStatus.add("NOT_ACTIVE");
-//        listStatus.add("DELETED");
-//        listStatus.add("ACTIVE_PRODUCT");
-//        listStatus.add("ALL_SOLD_OUT");
-//        listStatus.add("WAITING_ORDER");
-//        listStatus.add("PACKING_ORDER");
-//        listStatus.add("DELIVERING_ORDER");
-//        listStatus.add("DELIVERED_ORDER");
-//        listStatus.add("CANCELED_ORDER");
-//        List<String> listStatusDescription = new ArrayList<>();
-//        listStatusDescription.add("Have Token");
-//        listStatusDescription.add("WithOut Token");
-//        listStatusDescription.add("Deleted Logically");
-//        listStatusDescription.add("Product Exist");
-//        listStatusDescription.add("All Products Were Sold");
-//        listStatusDescription.add("Waiting For Process");
-//        listStatusDescription.add("Packing Product");
-//        listStatusDescription.add("Deliver Product");
-//        listStatusDescription.add("Delivered Successfully");
-//        listStatusDescription.add("Order Canceled");
-//
-//        for (int a = 0; a < listStatus.size(); a++) {
-//            StatusDao statusDao = new StatusDao();
-//            statusDao.setDescription(listStatusDescription.get(a));
-//            statusDao.setName(listStatus.get(a));
-//            statusRepository.save(statusDao);
-//        }
-//
-//        RoleDao roleDao = roleRepository.findByName("ADMIN");
-//        StatusDao statusDao = statusRepository.findByName("NOT_ACTIVE");
-//        UserDao addAdmin = new UserDao();
-//        addAdmin.setUsername("Admin");
-//        addAdmin.setPassword(bcryptEncoder.encode("1234"));
-//        addAdmin.setRoleDao(roleDao);
-//        addAdmin.setStatusDao(statusDao);
-//        userRepository.save(addAdmin);
-//
-//
-//        List<String> listTags = new ArrayList<>();
-//        listTags.add("CLOTHS");
-//        listTags.add("DIGITAL");
-//        List<String> listTagsDescription = new ArrayList<>();
-//        listTagsDescription.add("Pooshak");
-//        listTagsDescription.add("Lavazem Digital");
-//
-//        for (int a = 0; a < listTags.size(); a++) {
-//            TagDao tagDao = new TagDao();
-//            tagDao.setName(listTags.get(a));
-//            tagDao.setDescription(listTagsDescription.get(a));
-//            tagRepository.save(tagDao);
-//        }
-//    }
+    // insert requirements data to database when we start project
+    @EventListener
+    public void appReady(ApplicationReadyEvent event) {
+        long roleCount = roleRepository.count();
+        if (roleCount == 0){
+            List<String> listRoles = new ArrayList<>();
+            listRoles.add("ADMIN");
+            listRoles.add("USER");
+            List<String> listRolesDescription = new ArrayList<>();
+            listRolesDescription.add("Full Access");
+            listRolesDescription.add("Limited Access");
+
+            for (int a = 0; a < listRoles.size(); a++) {
+                RoleDao role = new RoleDao();
+                role.setName(listRoles.get(a));
+                role.setDescription(listRolesDescription.get(a));
+                roleRepository.save(role);
+            }
+        }
+
+        long statsCount = statusRepository.count();
+        if (statsCount == 0){
+            List<String> listStatus = new ArrayList<>();
+            listStatus.add("ACTIVE");
+            listStatus.add("NOT_ACTIVE");
+            listStatus.add("DELETED");
+            listStatus.add("ACTIVE_PRODUCT");
+            listStatus.add("ALL_SOLD_OUT");
+            listStatus.add("WAITING_ORDER");
+            listStatus.add("PACKING_ORDER");
+            listStatus.add("DELIVERING_ORDER");
+            listStatus.add("DELIVERED_ORDER");
+            listStatus.add("CANCELED_ORDER");
+            List<String> listStatusDescription = new ArrayList<>();
+            listStatusDescription.add("Activated");
+            listStatusDescription.add("WithOut Token");
+            listStatusDescription.add("Deleted Logically");
+            listStatusDescription.add("Product Exist");
+            listStatusDescription.add("All Products Were Sold");
+            listStatusDescription.add("Waiting For Process");
+            listStatusDescription.add("Packing Product");
+            listStatusDescription.add("Deliver Product");
+            listStatusDescription.add("Delivered Successfully");
+            listStatusDescription.add("Order Canceled");
+
+            for (int a = 0; a < listStatus.size(); a++) {
+                StatusDao statusDao = new StatusDao();
+                statusDao.setDescription(listStatusDescription.get(a));
+                statusDao.setName(listStatus.get(a));
+                statusRepository.save(statusDao);
+            }
+        }
+
+        long userCount = userRepository.count();
+        if (userCount == 0){
+            RoleDao roleDao = roleRepository.findByName("ADMIN");
+            StatusDao statusDao = statusRepository.findByName("NOT_ACTIVE");
+            UserDao addAdmin = new UserDao();
+            addAdmin.setUsername("Admin");
+            addAdmin.setPassword(bcryptEncoder.encode("1234"));
+            addAdmin.setRoleDao(roleDao);
+            addAdmin.setStatusDao(statusDao);
+            userRepository.save(addAdmin);
+        }
+
+        long tagCount = tagRepository.count();
+        if (tagCount == 0){
+            List<String> listTags = new ArrayList<>();
+            listTags.add("CLOTHS");
+            listTags.add("DIGITAL");
+            List<String> listTagsDescription = new ArrayList<>();
+            listTagsDescription.add("Pooshak");
+            listTagsDescription.add("Lavazem Digital");
+
+            for (int a = 0; a < listTags.size(); a++) {
+                TagDao tagDao = new TagDao();
+                tagDao.setName(listTags.get(a));
+                tagDao.setDescription(listTagsDescription.get(a));
+                tagRepository.save(tagDao);
+            }
+        }
+
+    }
 
 }
 

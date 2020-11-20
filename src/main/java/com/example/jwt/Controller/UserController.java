@@ -11,7 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin()
+@CrossOrigin
 @ApiResponses({
         @ApiResponse(code = 400, message = "Bad Request"),
         @ApiResponse(code = 401, message = "Unauthorized"),
@@ -27,7 +27,7 @@ public class UserController {
 
     // get list of users (only admin have access)
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/user/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/user/list", method = RequestMethod.GET)
     public ResponseEntity<?> getUsers() {
         return ResponseEntity.ok(userService.getUserList());
     }
@@ -40,49 +40,49 @@ public class UserController {
 
     // edit user profile using UserUpdate model (UserUpdate model = Information requested) (each user can only edit their user profile)
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    @RequestMapping(value = "/user/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/user/update", method = RequestMethod.POST)
     public ResponseEntity<?> updateUser(@RequestBody UserUpdate user) {
         return userService.update(user);
     }
 
     // edit user profile using UserUpdate model (UserUpdate model = Information requested) (only admin have access)(access to all users)
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/user/updateByAdmin", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/user/updateByAdmin", method = RequestMethod.POST)
     public ResponseEntity<?> updateUserByAdmin(@RequestBody UserUpdate user) {
         return ResponseEntity.ok(userService.updateByAdmin(user));
     }
 
     // remove logically user using user_id (only admin have access)
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/user/remove", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/user/remove", method = RequestMethod.POST)
     public ResponseEntity<?> removeUserByAdmin(@RequestBody UserUpdate user) {
         return ResponseEntity.ok(userService.remove(user));
     }
 
     // get list of user products using user_id (only admin have access)
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/user/{id}/products", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/user/{id}/products", method = RequestMethod.GET)
     public ResponseEntity<?> userProductsList(@PathVariable(value = "id") int userId) {
         return ResponseEntity.ok(userService.userProductsList(userId));
     }
 
     // get list of user orders using user_id (only admin have access)
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(value = "/user/{id}/orders", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/user/{id}/orders", method = RequestMethod.GET)
     public ResponseEntity<?> userOrdersList(@PathVariable(value = "id") int userId) {
         return ResponseEntity.ok(userService.userOrdersList(userId));
     }
 
     // get list of user products using token (only his/her products)
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    @RequestMapping(value = "/user/me/products", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/user/me/products", method = RequestMethod.GET)
     public ResponseEntity<?> myProductsList(@RequestHeader(value = "Authorization") String token) {
         return ResponseEntity.ok(userService.myProductsList(token));
     }
 
     // get list of user orders using token (only his/her orders)
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    @RequestMapping(value = "/user/me/orders", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/user/me/orders", method = RequestMethod.GET)
     public ResponseEntity<?> myOrdersList(@RequestHeader(value = "Authorization") String token) {
         return ResponseEntity.ok(userService.myOrdersList(token));
     }
